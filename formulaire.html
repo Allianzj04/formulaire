@@ -60,6 +60,8 @@
             align-items: center;
             margin-bottom: 28px;
             border: 1px solid #d9e6f5;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .weather-box .city {
@@ -295,7 +297,7 @@
                 <span>ou</span>
             </div>
 
-            <a href="https://wa.me/25768975638?text=Bonjour%2C%20je%20souhaite%20effectuer%20un%20paiement"
+            <a href="https://wa.me/257XXXXXXXX?text=Bonjour%2C%20je%20souhaite%20effectuer%20un%20paiement"
                target="_blank"
                rel="noopener noreferrer"
                class="whatsapp-btn">
@@ -307,19 +309,47 @@
             </a>
 
             <p class="footer-note">
-                🔒 Les données sont simulées à des fins éducatives
+                🔒 Les données sont stockées dans Firebase Firestore
             </p>
 
         </div>
     </div>
 
     <!-- ======================================== -->
-    <!-- SCRIPT -->
+    <!-- SCRIPT : FIREBASE + MÉTÉO + FORMULAIRE -->
     <!-- ======================================== -->
-    <script>
+    <script type="module">
         // ============================================================
-        // 1. MÉTÉO : API gratuite pour Bujumbura, Burundi
-        //    On utilise wttr.in qui ne nécessite pas de clé API.
+        // 1. CONFIGURATION FIREBASE
+        //    🔴 REMPLACE AVEC TES VRAIES CLÉS (depuis Firebase Console)
+        // ============================================================
+        const firebaseConfig = {
+        apiKey: "AIzaSyCj1mmOM2nV5HBHVk0-Iec4FKqqZfz0A9M",
+        authDomain: "st-project-91bd9.firebaseapp.com",
+        projectId: "st-project-91bd9",
+        storageBucket: "st-project-91bd9.firebasestorage.app",
+        messagingSenderId: "304249842658",
+        appId: "1:304249842658:web:5e7cee4dbd052544fc67bb"
+        };
+
+        console.log("✅ 1. Configuration Firebase chargée");
+
+        // ============================================================
+        // 2. INITIALISER FIREBASE
+        // ============================================================
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        console.log("✅ 2. Modules Firebase importés");
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        console.log("✅ 3. Firebase initialisé");
+
+        // ============================================================
+        // 3. MÉTÉO : API gratuite pour Bujumbura, Burundi
+        //    (wttr.in ne nécessite pas de clé API)
         // ============================================================
         async function fetchWeather() {
             const loader = document.getElementById('weatherLoader');
@@ -327,15 +357,11 @@
             const descEl = document.getElementById('weatherDesc');
 
             try {
-                // wttr.in : météo gratuite, format JSON
                 const res = await fetch('https://wttr.in/Bujumbura?format=j1&lang=fr');
                 if (!res.ok) throw new Error('Météo indisponible');
 
                 const data = await res.json();
-
-                // Température actuelle en °C
                 const temp = data.current_condition[0].temp_C;
-                // Description (ex: "Ensoleillé")
                 const desc = data.current_condition[0].weatherDesc[0].value;
 
                 loader.style.display = 'none';
@@ -348,13 +374,12 @@
             }
         }
 
-        // Charger la météo au démarrage
         fetchWeather();
 
         // ============================================================
-        // 2. FORMULAIRE DE PAIEMENT (simulation)
+        // 4. FORMULAIRE : ENVOI VERS FIRESTORE
         // ============================================================
-        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const nom = document.getElementById('nom').value.trim();
@@ -372,21 +397,36 @@
                 return;
             }
 
-            // Formatage simple du numéro de carte (masquage)
-            const carteMasquee = '**** ' + carte.slice(-4);
+            try {
+                console.log('🔄 Envoi vers Firestore...');
 
-            // Simulation de paiement
-            statusDiv.className = 'success';
-            statusDiv.textContent = `✅ Paiement de ${montant} BIF effectué avec succès pour ${nom} (carte ${carteMasquee}) !`;
+                // Envoyer les données vers Firestore (collection "paiements")
+                const docRef = await addDoc(collection(db, "paiements"), {
+                    nom: nom,
+                    email: email,
+                    carte: carte.slice(-4),      // On garde seulement les 4 derniers chiffres
+                    expiration: expiration,
+                    montant: montant,
+                    date: new Date().toISOString()
+                });
 
-            // Réinitialiser le formulaire (optionnel)
-            // this.reset();
+                console.log('✅ Document créé avec ID :', docRef.id);
 
-            console.log('💳 Paiement simulé :', { nom, email, carte: carteMasquee, expiration, cvv, montant });
+                statusDiv.className = 'success';
+                statusDiv.textContent = `✅ Paiement de ${montant} BIF enregistré avec succès ! ID: ${docRef.id}`;
+
+                // Réinitialiser le formulaire
+                document.getElementById('paymentForm').reset();
+
+            } catch (error) {
+                console.error('❌ Erreur Firestore :', error);
+                statusDiv.className = 'error';
+                statusDiv.textContent = `❌ Erreur : ${error.message}`;
+            }
         });
 
         // ============================================================
-        // 3. FORMATAGE AUTO DU NUMÉRO DE CARTE (espaces tous les 4)
+        // 5. FORMATAGE AUTO DU NUMÉRO DE CARTE (espaces tous les 4)
         // ============================================================
         document.getElementById('carte').addEventListener('input', function(e) {
             let value = this.value.replace(/\D/g, '');
@@ -400,7 +440,7 @@
         });
 
         // ============================================================
-        // 4. FORMATAGE AUTO DE L'EXPIRATION (MM/AA)
+        // 6. FORMATAGE AUTO DE L'EXPIRATION (MM/AA)
         // ============================================================
         document.getElementById('expiration').addEventListener('input', function(e) {
             let value = this.value.replace(/\D/g, '');
@@ -412,12 +452,7 @@
             }
         });
 
-        // ============================================================
-        // 5. WHATSAPP : le bouton utilise déjà wa.me
-        //    L'URL est : https://wa.me/257XXXXXXXX?text=...
-        //    Remplace 257XXXXXXXX par le vrai numéro du prof.
-        // ============================================================
-        console.log('✅ Formulaire de paiement chargé');
+        console.log('✅ Formulaire de paiement avec Firebase chargé');
     </script>
 
 </body>
