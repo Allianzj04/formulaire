@@ -326,11 +326,13 @@
             </form>
 
             <!-- ======================================== -->
-            <!-- LIEN VERS GOOGLE SHEETS -->
+            <!-- LIEN VERS GOOGLE SHEETS (corrigé) -->
             <!-- ======================================== -->
             <div class="sheets-link">
                 <span class="label">📊 Voir les données en temps réel</span>
-                <a href="https://docs.google.com/spreadsheets/d/1xoyuWci4teMOzDn1vE5qXnIMOwayFg5qnDXebalVJQI/edit?gid=108131071#gid=108131071" target="_blank"  rel="noopener noreferrer">
+                <a href="https://docs.google.com/spreadsheets/d/1xoyuWci4teMOzDn1vE5qXnIMOwayFg5qnDXebalVJQI/edit?gid=108131071#gid=108131071"
+                   target="_blank"
+                   rel="noopener noreferrer">
                     🔗 Ouvrir Google Sheets
                 </a>
             </div>
@@ -343,7 +345,7 @@
             </div>
 
             <!-- ======================================== -->
-            <!-- BOUTON WHATSAPP (wa.me) -->
+            <!-- BOUTON WHATSAPP (corrigé) -->
             <!-- ======================================== -->
             <a href="https://wa.me/25768975638?text=Bonjour%2C%20je%20viens%20de%20tester%20le%20formulaire%20de%20paiement.%20Les%20donn%C3%A9es%20sont%20bien%20arriv%C3%A9es%20dans%20Firebase%20et%20Google%20Sheets%20%21%20%F0%9F%91%8C"
                target="_blank"
@@ -355,7 +357,9 @@
                 </svg>
                 📱 Confirmer sur WhatsApp
             </a>
-
+            <p class="whatsapp-note">
+                👨‍🏫 Cliquez ici pour confirmer au prof que le test est réussi
+            </p>
 
             <p class="footer-note">
                 🔒 Les données sont stockées dans Firebase Firestore et synchronisées avec Google Sheets
@@ -370,7 +374,6 @@
     <script type="module">
         // ============================================================
         // 1. CONFIGURATION FIREBASE
-        //    🔴 REMPLACE AVEC TES VRAIES CLÉS (depuis Firebase Console)
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCj1mmOM2nV5HBHVk0-Iec4FKqqZfz0A9M",
@@ -384,7 +387,7 @@
         console.log("✅ 1. Configuration Firebase chargée");
 
         // ============================================================
-        // 2. IMPORT DES MODULES (CDN - UNE SEULE FOIS)
+        // 2. IMPORT DES MODULES
         // ============================================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -400,7 +403,7 @@
         console.log("✅ 3. Firebase initialisé");
 
         // ============================================================
-        // 4. MÉTÉO : API gratuite pour Bujumbura, Burundi
+        // 4. MÉTÉO
         // ============================================================
         async function fetchWeather() {
             const loader = document.getElementById('weatherLoader');
