@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TP Services Web — Formulaire Firebase + Google Sheet</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main class="container">
+    <h1>Formulaire de contact</h1>
+    <p class="subtitle">TP Services Web — envoi vers Firebase Firestore et Google Sheet</p>
+
+    <form id="contactForm">
+      <label for="nom">Nom</label>
+      <input type="text" id="nom" name="nom" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="sujet">Sujet</label>
+      <input type="text" id="sujet" name="sujet" required>
+
+      <label for="message">Message</label>
+      <textarea id="message" name="message" rows="5" required></textarea>
+
+      <button type="submit">Envoyer</button>
+    </form>
+
+    <p id="statusMsg" class="status"></p>
+  </main>
+
+  <!-- SDK Firebase (version modulaire, chargée via CDN) -->
+  <script type="module" src="script.js"></script>
+</body>
+</html>

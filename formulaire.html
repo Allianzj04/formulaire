@@ -1,80 +1,154 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Formulaire Firebase</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 500px;
-            margin: 50px auto;
-            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 550px;
+            margin: 60px auto;
+            padding: 0 20px;
+            background: #f7f9fc;
         }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px 35px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e9edf4;
+        }
+
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
+
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #2c3e50;
+            margin-bottom: 6px;
         }
-        input, textarea {
+
+        input,
+        textarea {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 1rem;
+            border: 1.5px solid #dce1e8;
+            border-radius: 10px;
+            background: #fafcff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: inherit;
         }
+
+        input:focus,
+        textarea:focus {
+            border-color: #4a90d9;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(74, 144, 217, 0.15);
+            background: white;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
         button {
-            background-color: #4CAF50;
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: #4a90d9;
             color: white;
-            padding: 10px 20px;
             border: none;
-            border-radius: 4px;
+            border-radius: 10px;
             cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            letter-spacing: 0.3px;
         }
+
         button:hover {
-            background-color: #45a049;
+            background: #357abd;
         }
-        #message {
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        #statusMessage {
             margin-top: 20px;
-            padding: 10px;
-            border-radius: 4px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-weight: 500;
+            display: none;
         }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
+
+        #statusMessage.success {
+            display: block;
+            background: #e3f5ec;
+            color: #0b6e4f;
+            border: 1px solid #b7e4d0;
         }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
+
+        #statusMessage.error {
+            display: block;
+            background: #fde8e8;
+            color: #a13030;
+            border: 1px solid #f5cdcd;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.85rem;
+            color: #8b9bb5;
         }
     </style>
 </head>
 <body>
-    <h2>Formulaire de Contact</h2>
-    
-    <form id="contactForm">
-        <div class="form-group">
-            <label for="nom">Nom :</label>
-            <input type="text" id="nom" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="email">Email :</label>
-            <input type="email" id="email" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="message">Message :</label>
-            <textarea id="message" rows="4" required></textarea>
-        </div>
-        
-        <button type="submit">Envoyer</button>
-    </form>
-    
-    <div id="statusMessage"></div>
 
-    <script src="script.js"></script>
+    <div class="card">
+        <h2>📬 Formulaire de contact</h2>
+
+        <form id="contactForm">
+            <div class="form-group">
+                <label for="nom">Nom complet</label>
+                <input type="text" id="nom" placeholder="Votre nom" required />
+            </div>
+
+            <div class="form-group">
+                <label for="email">Adresse email</label>
+                <input type="email" id="email" placeholder="vous@exemple.com" required />
+            </div>
+
+            <div class="form-group">
+                <label for="message">Message</label>
+                <textarea id="message" rows="4" placeholder="Écrivez votre message ici…" required></textarea>
+            </div>
+
+            <button type="submit">Envoyer le message</button>
+        </form>
+
+        <div id="statusMessage"></div>
+        <div class="footer-note">Les données sont stockées dans Firebase Firestore</div>
+    </div>
+
+    <!-- 🔥 Le script qui gère Firebase et l'envoi du formulaire -->
+    <script type="module" src="script.js"></script>
 </body>
 </html>
