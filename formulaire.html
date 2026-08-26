@@ -338,11 +338,6 @@
         appId: "1:304249842658:web:5e7cee4dbd052544fc67bb"
         };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-
-        console.log("✅ 1. Configuration Firebase chargée");
-
         // ============================================================
         // 2. INITIALISER FIREBASE
         // ============================================================
@@ -351,7 +346,7 @@
 
         console.log("✅ 2. Modules Firebase importés");
 
-        app = initializeApp(firebaseConfig);
+        const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         console.log("✅ 3. Firebase initialisé");
