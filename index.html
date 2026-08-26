@@ -1,37 +1,424 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TP Services Web — Formulaire Firebase + Google Sheet</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Formulaire de Paiement</title>
+    <style>
+        /* --- RESET & BASE --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6fa;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 580px;
+            width: 100%;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 35px 40px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid #eef2f7;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1a2634;
+            font-weight: 600;
+            font-size: 1.7rem;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7a8a9e;
+            font-size: 0.95rem;
+            margin-bottom: 28px;
+        }
+
+        /* --- MÉTÉO --- */
+        .weather-box {
+            background: #eef6ff;
+            border-radius: 12px;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            border: 1px solid #d9e6f5;
+        }
+
+        .weather-box .city {
+            font-weight: 600;
+            color: #1a2634;
+        }
+
+        .weather-box .temp {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1a4c8a;
+        }
+
+        .weather-box .desc {
+            color: #4a6a8a;
+            font-size: 0.9rem;
+        }
+
+        .weather-box .loader {
+            color: #7a8a9e;
+            font-size: 0.9rem;
+        }
+
+        /* --- FORMULAIRE --- */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 11px 15px;
+            font-size: 1rem;
+            border: 1.5px solid #dce1e8;
+            border-radius: 10px;
+            background: #fafcff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #4a90d9;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(74, 144, 217, 0.12);
+            background: #ffffff;
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .row .form-group {
+            flex: 1;
+        }
+
+        /* --- BOUTON PAIEMENT --- */
+        .pay-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            background: #1a4c8a;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .pay-btn:hover {
+            background: #0f3a6e;
+        }
+
+        .pay-btn:active {
+            transform: scale(0.97);
+        }
+
+        #statusMessage {
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-weight: 500;
+            display: none;
+        }
+
+        #statusMessage.success {
+            display: block;
+            background: #e3f5ec;
+            color: #0b6e4f;
+            border: 1px solid #b7e4d0;
+        }
+
+        #statusMessage.error {
+            display: block;
+            background: #fde8e8;
+            color: #a13030;
+            border: 1px solid #f5cdcd;
+        }
+
+        /* --- SÉPARATEUR + BOUTON WHATSAPP --- */
+        .divider {
+            margin: 28px 0 20px;
+            border-top: 2px solid #eef2f7;
+            padding-top: 20px;
+            text-align: center;
+        }
+
+        .divider span {
+            background: #ffffff;
+            padding: 0 16px;
+            color: #8b9bb5;
+            font-size: 0.85rem;
+            font-weight: 500;
+            position: relative;
+            top: -12px;
+        }
+
+        .whatsapp-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #25D366;
+            color: white;
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
+            width: 100%;
+        }
+
+        .whatsapp-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        .whatsapp-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+            flex-shrink: 0;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 0.8rem;
+            color: #8b9bb5;
+        }
+    </style>
 </head>
 <body>
 
-  <main class="container">
-    <h1>Formulaire de contact</h1>
-    <p class="subtitle">TP Services Web — envoi vers Firebase Firestore et Google Sheet</p>
+    <div class="container">
+        <div class="card">
 
-    <form id="contactForm">
-      <label for="nom">Nom</label>
-      <input type="text" id="nom" name="nom" required>
+            <!-- ======================================== -->
+            <!-- TITRE -->
+            <!-- ======================================== -->
+            <h2>💳 Paiement sécurisé</h2>
+            <p class="subtitle">Remplissez les informations ci-dessous</p>
 
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required>
+            <!-- ======================================== -->
+            <!-- MÉTÉO (API gratuite) -->
+            <!-- ======================================== -->
+            <div class="weather-box" id="weatherBox">
+                <span class="city">📍 Bujumbura, Burundi</span>
+                <span class="loader" id="weatherLoader">Chargement météo...</span>
+                <span class="temp" id="weatherTemp"></span>
+                <span class="desc" id="weatherDesc"></span>
+            </div>
 
-      <label for="sujet">Sujet</label>
-      <input type="text" id="sujet" name="sujet" required>
+            <!-- ======================================== -->
+            <!-- FORMULAIRE DE PAIEMENT -->
+            <!-- ======================================== -->
+            <form id="paymentForm">
 
-      <label for="message">Message</label>
-      <textarea id="message" name="message" rows="5" required></textarea>
+                <div class="form-group">
+                    <label for="nom">Nom complet du titulaire</label>
+                    <input type="text" id="nom" placeholder="Jean Dupont" required />
+                </div>
 
-      <button type="submit">Envoyer</button>
-    </form>
+                <div class="form-group">
+                    <label for="email">Adresse email</label>
+                    <input type="email" id="email" placeholder="jean@email.com" required />
+                </div>
 
-    <p id="statusMsg" class="status"></p>
-  </main>
+                <div class="form-group">
+                    <label for="carte">Numéro de carte</label>
+                    <input type="text" id="carte" placeholder="1234 5678 9012 3456" maxlength="19" required />
+                </div>
 
-  <!-- SDK Firebase (version modulaire, chargée via CDN) -->
-  <script type="module" src="script.js"></script>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="expiration">Date d'expiration</label>
+                        <input type="text" id="expiration" placeholder="MM/AA" maxlength="5" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="cvv">CVV</label>
+                        <input type="text" id="cvv" placeholder="123" maxlength="4" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="montant">Montant (BIF)</label>
+                    <input type="number" id="montant" placeholder="5000" required />
+                </div>
+
+                <button type="submit" class="pay-btn">💳 Payer maintenant</button>
+
+                <div id="statusMessage"></div>
+            </form>
+
+            <!-- ======================================== -->
+            <!-- BOUTON WHATSAPP (wa.me) -->
+            <!-- ======================================== -->
+            <div class="divider">
+                <span>ou</span>
+            </div>
+
+            <a href="https://wa.me/25768975638?text=Bonjour%2C%20je%20souhaite%20effectuer%20un%20paiement"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="whatsapp-btn">
+                <!-- Icône WhatsApp (SVG) -->
+                <svg viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+                Contacter le support WhatsApp
+            </a>
+
+            <p class="footer-note">
+                🔒 Les données sont simulées à des fins éducatives
+            </p>
+
+        </div>
+    </div>
+
+    <!-- ======================================== -->
+    <!-- SCRIPT -->
+    <!-- ======================================== -->
+    <script>
+        // ============================================================
+        // 1. MÉTÉO : API gratuite pour Bujumbura, Burundi
+        //    On utilise wttr.in qui ne nécessite pas de clé API.
+        // ============================================================
+        async function fetchWeather() {
+            const loader = document.getElementById('weatherLoader');
+            const tempEl = document.getElementById('weatherTemp');
+            const descEl = document.getElementById('weatherDesc');
+
+            try {
+                // wttr.in : météo gratuite, format JSON
+                const res = await fetch('https://wttr.in/Bujumbura?format=j1&lang=fr');
+                if (!res.ok) throw new Error('Météo indisponible');
+
+                const data = await res.json();
+
+                // Température actuelle en °C
+                const temp = data.current_condition[0].temp_C;
+                // Description (ex: "Ensoleillé")
+                const desc = data.current_condition[0].weatherDesc[0].value;
+
+                loader.style.display = 'none';
+                tempEl.textContent = `${temp}°C`;
+                descEl.textContent = desc;
+
+            } catch (error) {
+                loader.textContent = '⚠️ Météo non disponible';
+                console.warn('Erreur météo :', error);
+            }
+        }
+
+        // Charger la météo au démarrage
+        fetchWeather();
+
+        // ============================================================
+        // 2. FORMULAIRE DE PAIEMENT (simulation)
+        // ============================================================
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const nom = document.getElementById('nom').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const carte = document.getElementById('carte').value.trim();
+            const expiration = document.getElementById('expiration').value.trim();
+            const cvv = document.getElementById('cvv').value.trim();
+            const montant = document.getElementById('montant').value.trim();
+            const statusDiv = document.getElementById('statusMessage');
+
+            // Vérification basique
+            if (!nom || !email || !carte || !expiration || !cvv || !montant) {
+                statusDiv.className = 'error';
+                statusDiv.textContent = '⚠️ Tous les champs sont obligatoires.';
+                return;
+            }
+
+            // Formatage simple du numéro de carte (masquage)
+            const carteMasquee = '**** ' + carte.slice(-4);
+
+            // Simulation de paiement
+            statusDiv.className = 'success';
+            statusDiv.textContent = `✅ Paiement de ${montant} BIF effectué avec succès pour ${nom} (carte ${carteMasquee}) !`;
+
+            // Réinitialiser le formulaire (optionnel)
+            // this.reset();
+
+            console.log('💳 Paiement simulé :', { nom, email, carte: carteMasquee, expiration, cvv, montant });
+        });
+
+        // ============================================================
+        // 3. FORMATAGE AUTO DU NUMÉRO DE CARTE (espaces tous les 4)
+        // ============================================================
+        document.getElementById('carte').addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 16) value = value.slice(0, 16);
+            let formatted = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) formatted += ' ';
+                formatted += value[i];
+            }
+            this.value = formatted;
+        });
+
+        // ============================================================
+        // 4. FORMATAGE AUTO DE L'EXPIRATION (MM/AA)
+        // ============================================================
+        document.getElementById('expiration').addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 4) value = value.slice(0, 4);
+            if (value.length >= 2) {
+                this.value = value.slice(0, 2) + '/' + value.slice(2);
+            } else {
+                this.value = value;
+            }
+        });
+
+        // ============================================================
+        // 5. WHATSAPP : le bouton utilise déjà wa.me
+        //    L'URL est : https://wa.me/257XXXXXXXX?text=...
+        //    Remplace 257XXXXXXXX par le vrai numéro du prof.
+        // ============================================================
+        console.log('✅ Formulaire de paiement chargé');
+    </script>
+
 </body>
 </html>
